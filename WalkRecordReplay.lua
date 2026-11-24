@@ -1,4 +1,5 @@
 -- AUTO WALK RECORD & REPLAY
+print("[WalkRecordReplay] Skrip mulai dijalankan")
 -- Versi dengan simpan/muat/hapus konfigurasi, daftar yang bisa digulir,
 -- serta tombol minimalkan, pulihkan, dan tutup.
 -- Penyimpanan permanen memakai API executor: writefile/readfile/isfile/listfiles/delfile.
@@ -37,6 +38,8 @@ local function getHumanoid()
     local character = getCharacter()
     return character and character:FindFirstChildOfClass("Humanoid")
 end
+
+local statusLabel
 
 local function setStatus(message)
     if statusLabel then
@@ -129,7 +132,17 @@ end
 
 -- GUI
 local playerGui = player:WaitForChild("PlayerGui")
-local oldGui = playerGui:FindFirstChild("WalkRecordReplay")
+local guiParent = playerGui
+
+-- Beberapa executor Android menyediakan gethui() untuk GUI executor.
+if type(gethui) == "function" then
+    local ok, hui = pcall(gethui)
+    if ok and hui then
+        guiParent = hui
+    end
+end
+
+local oldGui = guiParent:FindFirstChild("WalkRecordReplay")
 if oldGui then
     oldGui:Destroy()
 end
@@ -138,7 +151,7 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "WalkRecordReplay"
 screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-screenGui.Parent = playerGui
+screenGui.Parent = guiParent
 
 local main = Instance.new("Frame")
 main.Name = "Main"
@@ -311,7 +324,7 @@ listLayout.Padding = UDim.new(0, 4)
 listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 listLayout.Parent = configList
 
-local statusLabel = Instance.new("TextLabel")
+statusLabel = Instance.new("TextLabel")
 statusLabel.Size = UDim2.new(1, 0, 0, 32)
 statusLabel.BackgroundTransparency = 1
 statusLabel.Text = "Status: Siap"
